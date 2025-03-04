@@ -1,0 +1,37 @@
+api:
+  dashboard: true
+
+log:
+  level: DEBUG
+  filePath: 'log-file.log'
+  format: 'common'
+
+accessLog:
+  filePath: 'log-access.log'
+  bufferingSize: 100
+
+entryPoints:
+  http:
+    address: ':80'
+  https:
+    address: ':443'
+
+providers:
+  docker:
+    endpoint: 'unix:///var/run/docker.sock'
+    exposedByDefault: false
+  file:
+    directory: '/etc/traefik/dynamic'
+    watch: true
+
+tls:
+  certificates:
+    - certFile: /etc/certs/traefik.crt
+      keyFile: /etc/certs/traefik-key.pem
+    - certFile: /etc/certs/mysite.crt
+      keyFile: /etc/certs/mysite-key.pem
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /etc/certs/traefik.crt
+        keyFile: /etc/certs/traefik-key.pem
