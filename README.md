@@ -37,64 +37,21 @@ This project focuses on the simplest steps needed to setup a local Traefik envir
 6. Clone this repository
 
    ```
-   git clone https://github.com/cwilby/simple-local-traefik.git
+   git clone https://github.com/pxjam/simple-local-traefik.git
    cd simple-local-traefik
    ```
 
-7. Create a TLS certificate/key file for `traefik.test` and store in `certs` folder within the repository. Repeat for each of your domains.
+7. Create a TLS certificate/key files for `traefik.test` and `my-site.test` and and store in `certs` folder within the repository. Repeat for each of your domains.
 
    ```bash
-   mkcert -cert-file certs/local.crt -key-file certs/local-key.pem "traefik.test"
+   mkcert -cert-file certs/traefik.crt -key-file certs/traefik-key.pem "traefik.test"
+   mkcert -cert-file certs/mysite.crt -key-file certs/mysite-key.pem "my-site.test"
    ```
 
-8. Start traefik and verify that [`https://traefik.test/dashboard/`](https://traefik.test/dashboard/) works. **Note that the final `/` is mandatory**.
+8. Start docker-compose project
 
    ```sh
-   docker-compose up -d
+   docker compose up -d
    ```
 
-9. To start a Docker container connected to Traefik:
-
-   ```sh
-   docker run nginx:latest \
-     --network web \
-     --label "traefik.enable=true" \
-     --label "traefik.docker.network=web" \
-     --label "traefik.http.routers.my-site.entryPoints=https" \
-     --label "traefik.http.routers.my-site.rule=Host(`my-site.test`)" \
-     --label "traefik.http.routers.my-site.tls=true"
-   ```
-
-10. To do the same in a seperate docker-compose file:
-
-    ```yml
-    version: "3.7"
-
-    networks:
-      web:
-        external: true
-
-    services:
-      my-site:
-        image: nginx:latest
-        networks:
-          - web
-        labels:
-          - traefik.enable=true
-          - traefik.docker.network=web
-          - traefik.http.routers.my-site.entryPoints=https
-          - traefik.http.routers.my-site.rule=Host(`my-site.test`)
-          - traefik.http.routers.my-site.tls=true
-    ```
-
-## Frequently Asked Questions
-
-### What if a Docker container uses a port other than port 80?
-
-You can add a label to your Docker container to set the port, but it's better to let Traefik auto-find the port by looking at the ports exposed by the container.
-
-In other words, if you have a Docker container that exposes port 8080, Traefik will know to use port 8080.
-
-## Contributing
-
-Please submit issues if you think something can be improved, and preferably pull requests if you have the time.
+9. Visit https://traefik.test/dashboard/ and https://my-site.test in your browser.
